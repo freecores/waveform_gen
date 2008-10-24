@@ -10,7 +10,7 @@
 --                          Senior Design Consultant                --
 --                          www.zipcores.com                        --
 --                                                                  --
---    Date last modified  : 23.10.2008                              --
+--    Date last modified  : 24.10.2008                              --
 --                                                                  --
 --    Description         : NCO / Periodic Waveform Generator TB    --
 --                                                                  --
@@ -41,6 +41,9 @@ port (
   clk         : in  std_logic;
   reset       : in  std_logic;
   
+  -- clock-enable
+  en          : in  std_logic;
+  
   -- NCO frequency control
   phase_inc   : in  std_logic_vector(31 downto 0);
   
@@ -56,8 +59,9 @@ end component;
 signal  clk        : std_logic := '0';
 signal  reset      : std_logic := '0';
 signal  capture    : std_logic := '0';
+signal  en         : std_logic := '1';
 
-signal  phase_inc  : std_logic_vector(31 downto 0);
+signal  phase_inc  : std_logic_vector(31 downto 0) := (others => '0');
 
 signal  sin_out    : std_logic_vector(11 downto 0);
 signal  cos_out    : std_logic_vector(11 downto 0);
@@ -94,7 +98,7 @@ begin
     wait for 1 us;
 	wait until clk'event and clk = '1';
     capture <= '1';
-    
+        
     -- run sim for a while
     wait for 100 us;
     wait until clk'event and clk = '1';
@@ -110,6 +114,9 @@ port map (
   -- system signals
   clk         => clk,
   reset       => reset,
+  
+  -- clock-enable
+  en          => en,
   
   -- NCO frequency control
   phase_inc   => phase_inc,

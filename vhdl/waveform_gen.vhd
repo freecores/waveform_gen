@@ -10,7 +10,7 @@
 --                          Senior Design Consultant                --
 --                          www.zipcores.com                        --
 --                                                                  --
---    Date last modified  : 23.10.2008                              --
+--    Date last modified  : 24.10.2008                              --
 --                                                                  --
 --    Description         : NCO / Periodic Waveform Generator       --
 --                                                                  --
@@ -29,6 +29,9 @@ port (
   -- system signals
   clk         : in  std_logic;
   reset       : in  std_logic;
+  
+  -- clock-enable
+  en          : in  std_logic;
   
   -- NCO frequency control
   phase_inc   : in  std_logic_vector(31 downto 0);
@@ -50,6 +53,7 @@ component sincos_lut
 port (
 
   clk      : in  std_logic;
+  en       : in  std_logic;
   addr     : in  std_logic_vector(11 downto 0);
   sin_out  : out std_logic_vector(11 downto 0);
   cos_out  : out std_logic_vector(11 downto 0));
@@ -77,7 +81,9 @@ begin
   if reset = '0' then
     phase_acc <= (others => '0');
   elsif clk'event and clk = '1' then
-    phase_acc <= unsigned(phase_acc) + unsigned(phase_inc); 
+    if en = '1' then
+      phase_acc <= unsigned(phase_acc) + unsigned(phase_inc); 
+    end if;
   end if;
 end process phase_acc_reg;
 
@@ -99,6 +105,7 @@ lut: sincos_lut
   port map (
 
     clk       => clk,
+    en        => en,
     addr      => lut_addr,
     sin_out   => sin_out,
     cos_out   => cos_out );
@@ -110,7 +117,9 @@ lut: sincos_lut
 delay_regs: process(clk)
 begin
   if clk'event and clk = '1' then
-    lut_addr_reg <= lut_addr;
+    if en = '1' then
+      lut_addr_reg <= lut_addr;
+    end if;
   end if;
 end process delay_regs;
 

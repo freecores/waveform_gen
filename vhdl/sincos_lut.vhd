@@ -10,7 +10,7 @@
 --                          Senior Design Consultant                --
 --                          www.zipcores.com                        --
 --                                                                  --
---    Date last modified  : 26.05.2008                              --
+--    Date last modified  : 24.10.2008                              --
 --                                                                  --
 --    Description         : 4096 x 12-bit SIN/COS Look-up table     --
 --                                                                  --
@@ -27,6 +27,7 @@ entity sincos_lut is
 port (
 
   clk      : in  std_logic;
+  en       : in  std_logic;
   addr     : in  std_logic_vector(11 downto 0);
   sin_out  : out std_logic_vector(11 downto 0);
   cos_out  : out std_logic_vector(11 downto 0)
@@ -1082,8 +1083,10 @@ begin
 rom_select: process (clk)
 begin
   if clk'event and clk = '1' then
-    sin_out <= SIN_ROM(conv_integer(addr));
-    cos_out <= COS_ROM(conv_integer(addr));
+    if en = '1' then
+      sin_out <= SIN_ROM(conv_integer(addr));
+      cos_out <= COS_ROM(conv_integer(addr));
+    end if;
   end if;
 end process rom_select;
 
